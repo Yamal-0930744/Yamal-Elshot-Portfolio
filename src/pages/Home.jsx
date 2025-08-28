@@ -109,7 +109,7 @@ export default function Home() {
         }}
       >
         {/* ✨ subtle ambient glow for this section */}
-        <div className="sectionFx sectionFx--tight" aria-hidden />
+        <div aria-hidden />
 
         <ProfileCard
           imageSrc="/img/AboutPhoto.png"
@@ -121,7 +121,7 @@ export default function Home() {
       {/* JOURNEY */}
       <section id="journey" className="anchorSection" style={{ position: "relative" }}>
         {/* optional ambient for this slice */}
-        <div className="sectionFx sectionFx--bg" aria-hidden />
+        <div aria-hidden />
         <CreativeJourneySection />
       </section>
 
@@ -130,7 +130,7 @@ export default function Home() {
 
       {/* TOOLS (wrap with an anchor for header link & proper scroll-margin) */}
       <section id="tools" ref={toolsRef} className="anchorSection" style={{ position: "relative" }}>
-        <div className="sectionFx sectionFx--bg" aria-hidden />
+        <div aria-hidden />
         <StackOrbit />
       </section>
 
