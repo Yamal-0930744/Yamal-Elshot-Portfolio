@@ -1,0 +1,94 @@
+.profile-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: linear-gradient(135deg, rgba(34,40,49,0.65) 10%, rgba(123,227,198,0.05) 70%);
+  border-radius: 2px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.12);
+  padding: 0 2rem 0 0; /* reduced top/bottom padding */
+  max-width: 1100px;
+  min-height: 500px;
+  margin: 4rem auto;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.profile-card-image {
+  flex: 0 0 320px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start; /* Align image to the left */
+  margin-left: 0;              /* Remove any left margin */
+}
+
+.profile-card-image img {
+  width: auto;
+  height: 90%;
+  max-height: 500px;
+  object-fit: cover;
+  transform: scaleX(-1);       /* Flip horizontally */
+  margin-left: 0;              /* Ensure no extra margin */
+}
+
+.profile-card-content {
+  flex: 1;
+  padding-left: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-card-content h2 {
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 1200;
+  font-size: 2.6rem;
+  color: #e7e7ea;
+  margin: 0 0 1.2rem 0;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-shadow:
+    0 0 8px rgba(123, 227, 198, 0.1),
+    0 0 16px rgba(123, 227, 198, 0.05),
+    0 0 24px rgba(123, 227, 198, 0.05);
+}
+
+.profile-card-content p {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 200;
+  font-size: 1.1rem;
+  color: #a3a7b5;
+}
+
+.human-text {
+  font-weight: 900; /* Explicitly set to max bold */
+  letter-spacing: 0.2em;
+  color: #7be3a3; /* Accent color */
+  text-shadow: 0 0 12px rgba(123, 227, 198, 0.6); /* Add a glow */
+  font-size: 1.5em; /* Make it slightly larger */
+}
+
+
+.one-text {
+  font-weight: 900; /* Explicitly set to max bold */
+  letter-spacing: 0.1em;
+  color: #7be3a3; /* Accent color */
+  text-shadow: 0 0 12px rgba(123, 227, 132, 0.6); /* Add a glow */
+  font-size: 1.1em; /* Make it slightly larger */
+}
+
+/* smoother animations */
+.profile-card,
+.profile-card-image,
+.profile-card-content { will-change: transform, filter, opacity; }
+
+/* raise the card subtly when fully visible (pure CSS, complements the motion) */
+.profile-card {
+  transition: box-shadow .3s ease, transform .25s ease;
+}
+.profile-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 64px rgba(123, 227, 197, 0.009);
+}
