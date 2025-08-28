@@ -8,7 +8,7 @@ import { useMotionValueEvent } from "framer-motion";
 // helper
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
-/** Glassy plumbob that descends + spins faster as p→1 */
+/** Glassy plumbob that ascends + spins gently as p→1 */
 function GlassPlumbob({ p = 0 }) {
   const gltf = useGLTF("/models/plumbob.glb");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
@@ -35,15 +35,14 @@ function GlassPlumbob({ p = 0 }) {
   }, [scene]);
 
   useFrame((_, dt) => {
-    // spin ramps up toward the end
-// gentler spin-up
-const spin = 0.55 + p * 2.1;        // was 0.9 + p*6.5
-scene.rotation.y += dt * spin;
+    // gentler spin-up
+    const spin = 0.55 + p * 2.1;      // previously 0.9 + p * 6.5
+    scene.rotation.y += dt * spin;
 
-// end higher above the contact card
-const targetY = THREE.MathUtils.lerp(2.1, 1.3, p); // was 1.35 → 0.48
-
+    // finish higher above the contact card (centered feel)
+    const targetY = THREE.MathUtils.lerp(2.1, 1.3, p); // previously 1.35 → 0.48
     const targetS = THREE.MathUtils.lerp(0.16, 0.14, p);
+
     if (group.current) {
       group.current.position.y += (targetY - group.current.position.y) * 0.12;
       group.current.scale.setScalar(
@@ -60,7 +59,7 @@ const targetY = THREE.MathUtils.lerp(2.1, 1.3, p); // was 1.35 → 0.48
 }
 useGLTF.preload("/models/plumbob.glb");
 
-/** Slow ambient stars (always subtle), plus a big-bang burst as p→1 */
+/** Slow ambient stars + a big-bang burst as p→1 */
 function Stars({ p = 0 }) {
   const rot = useRef(0);
   useFrame((_, dt) => (rot.current += dt * 0.08));
@@ -99,23 +98,27 @@ function Stars({ p = 0 }) {
 /**
  * Fixed overlay Canvas that fades in as you approach the Contact section.
  * `progress` is a Framer Motion MotionValue (0..1) coming from Home.jsx.
+ *
+ * IMPORTANT: The overlay and its Canvas are pointer-events: none so they
+ * never block clicks on the page.
  */
 export default function ContactPlumbobFX({ progress }) {
-  // convert MotionValue to a plain number so React re-renders Sparkles props
+  // convert MotionValue to a number so React re-renders Sparkles props
   const [p, setP] = useState(0);
   useMotionValueEvent(progress, "change", (v) => setP(clamp01(v || 0)));
 
-  // make the whole overlay fade in quickly once the section starts entering
+  // fade in once the section starts entering
   const overlayOpacity = clamp01((p - 0.02) * 4); // ~0→1 fast
 
   return (
     <div
+      className="contactFxRoot"
       aria-hidden
       style={{
         position: "fixed",
         inset: 0,
-        pointerEvents: "none",
-        zIndex: 2,
+        pointerEvents: "none", // <-- wrapper ignores clicks
+        zIndex: 0,             // keep low; we don't need it above UI for clicks
         opacity: overlayOpacity,
         transition: "opacity .2s linear",
       }}
@@ -129,6 +132,7 @@ export default function ContactPlumbobFX({ progress }) {
           toneMapping: THREE.ACESFilmicToneMapping,
           outputColorSpace: THREE.SRGBColorSpace,
         }}
+        style={{ pointerEvents: "none" }}  // <-- critical: canvas ignores clicks
       >
         {/* light rig matches the rest of the site */}
         <ambientLight intensity={0.35} />

@@ -1427,3 +1427,57 @@ html { scroll-behavior: smooth; }
 .socialRow{
   justify-content: center;
 }
+
+/* ===== CLICK-THROUGH SAFETY FOR DECORATIVE LAYERS ===== */
+
+/* Global background stack */
+.bgRoot, .bgAurora, .bgGrid, .bgVignette, .bgNoise, .bgCursorLight {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Hero backdrop / glow layers */
+.heroFx {
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+/* Section ambient overlays we added */
+.sectionFx,
+.sectionFx--bg,
+.sectionFx--tight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none !important;
+  z-index: 0 !important; /* behind the section’s content */
+}
+
+/* Contact FX wrapper (if present) */
+.contactFxRoot {
+  position: fixed;
+  inset: 0;
+  pointer-events: none !important;
+  z-index: 0 !important; /* keep it behind everything interactive */
+}
+
+/* Make sure the actual content stacks above those backgrounds */
+.layer-above,
+.gridDash,
+.stackCanvasWrap,
+.stackCanvasPlain,
+.contactSection .contactCard,
+.dashViewport,
+.tile,
+.modalOverlay,
+.modalCard {
+  position: relative;
+  z-index: 1;
+}
+
+/* Header always above */
+.siteHeader, .siteHeader-inner { z-index: 1000; }
+
+/* If you ever add any other fixed canvases, force them to ignore clicks by default */
+.fxCanvas, .fixedCanvas {
+  pointer-events: none !important;
+}
