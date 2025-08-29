@@ -1,7 +1,16 @@
-
+// src/components/ProfileCard.jsx
 import "./ProfileCard.css";
 import { motion, useInView } from "framer-motion";
 import { useRef, useMemo } from "react";
+
+// Prefix relative asset paths with Vite's BASE_URL (needed on GitHub Pages subpath)
+const withBase = (path = "") => {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path) || /^data:/i.test(path)) return path; // leave absolute/data URIs alone
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const clean = path.replace(/^\/+/, "");
+  return `${base}/${clean}`;
+};
 
 export default function ProfileCard({ imageSrc, title, description }) {
   const ref = useRef(null);
@@ -40,7 +49,12 @@ export default function ProfileCard({ imageSrc, title, description }) {
       style={{ willChange: "transform, filter, opacity, box-shadow" }}
     >
       <motion.div className="profile-card-image" variants={imgVar} transition={{ duration: 0.8, ease: [0.22,1,0.36,1] }}>
-        <img src={imageSrc} alt={`${title} — profile`} />
+        <img
+          src={withBase(imageSrc)}
+          alt={`${title} — profile`}
+          loading="eager"
+          decoding="async"
+        />
       </motion.div>
 
       <motion.div className="profile-card-content" variants={textVar} transition={{ duration: 0.8, ease: [0.22,1,0.36,1] }}>

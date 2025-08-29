@@ -1,10 +1,20 @@
-
+// src/components/DashboardSection.jsx
 import { useMemo, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import GlassContainer from "./GlassContainer";
 import ProjectModal from "./ProjectModal";
 import { projects } from "../data/projects";
 
+// helper: prefix relative asset paths with Vite's BASE_URL (needed on GitHub Pages subpath)
+const withBase = (path = "") => {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path)) return path; // external URL
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const clean = path.replace(/^\/+/, "");
+  return `${base}/${clean}`;
+};
+
+// small helper to vary hover/flash tints per card
 const tints = [
   { bg: "rgba(123,227,198,0.12)", ring: "rgba(123,227,198,0.45)", glow: "rgba(123,227,198,0.35)" }, // green
   { bg: "rgba(138,180,255,0.12)", ring: "rgba(138,180,255,0.45)", glow: "rgba(138,180,255,0.35)" }, // blue
@@ -12,6 +22,7 @@ const tints = [
   { bg: "rgba(255,99,146,0.12)",  ring: "rgba(255,99,146,0.45)",  glow: "rgba(255,99,146,0.35)"  }, // pink
 ];
 
+// chunk projects into pages (4 tiles/page matches your 12-col grid)
 const PAGE_SIZE = 4;
 const chunk = (arr, size) =>
   arr.reduce((pages, _, i) => (i % size ? pages : [...pages, arr.slice(i, i + size)]), []);
@@ -52,29 +63,29 @@ export default function DashboardSection() {
   const baseShad = "0 10px 40px rgba(0,0,0,0.28)";
 
   return (
-  <section
-    id="work"
-    ref={sectionRef}
-    className="anchorSection"
-    style={{
-      position: "relative",
-      padding: "calc(6rem + var(--header-h)) 4vw 6rem", // keep your spacing but account for header
-      minHeight: "100vh",
-    }}
-  >
-    {/* invisible waypoint so the header spy can toggle "Work" as active at the right moment */}
-    <div
-      data-spy="work"
-      aria-hidden
+    <section
+      id="work"
+      ref={sectionRef}
+      className="anchorSection"
       style={{
-        position: "absolute",
-        top: "35vh",   // tweak if you want it earlier/later
-        left: 0,
-        width: 1,
-        height: 1,
-        pointerEvents: "none",
+        position: "relative",
+        padding: "calc(6rem + var(--header-h)) 4vw 6rem",
+        minHeight: "100vh",
       }}
-    />
+    >
+      {/* invisible waypoint so the header spy can toggle "Work" as active at the right moment */}
+      <div
+        data-spy="work"
+        aria-hidden
+        style={{
+          position: "absolute",
+          top: "35vh",
+          left: 0,
+          width: 1,
+          height: 1,
+          pointerEvents: "none",
+        }}
+      />
 
       <div className="dashViewport">
         <motion.div
@@ -117,6 +128,8 @@ export default function DashboardSection() {
                     },
                   };
 
+                  const coverSrc = withBase(p.cover);
+
                   return (
                     <GlassContainer
                       key={p.id}
@@ -125,10 +138,13 @@ export default function DashboardSection() {
                       motionProps={motionProps}
                     >
                       <img
-  src={p.cover}
-  alt=""
-  className={`tileImg ${p.isLogo ? "isLogo" : ""}`}
-/>
+                        src={coverSrc}
+                        alt={p.title || ""}
+                        className={`tileImg ${p.isLogo ? "isLogo" : ""}`}
+                        loading="lazy"
+                        decoding="async"
+                        sizes="(max-width: 900px) 50vw, 25vw"
+                      />
 
                       <div className="tileBody">
                         <h3 className="tileTitle">{p.title}</h3>
@@ -181,6 +197,7 @@ export default function DashboardSection() {
           <>
             <button
               className="dashArrow left"
+              type="button"
               aria-label="Previous"
               onClick={() => setPage((p) => Math.max(0, p - 1))}
               disabled={page === 0}
@@ -189,6 +206,7 @@ export default function DashboardSection() {
             </button>
             <button
               className="dashArrow right"
+              type="button"
               aria-label="Next"
               onClick={() => setPage((p) => Math.min(total - 1, p + 1))}
               disabled={page === total - 1}

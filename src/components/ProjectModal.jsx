@@ -1,7 +1,15 @@
-
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
+
+/* ---------- path helper (needed for GitHub Pages subpaths) ---------- */
+const withBase = (path = "") => {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path) || /^data:/i.test(path)) return path; // leave absolute/data URIs
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const clean = path.replace(/^\/+/, "");
+  return `${base}/${clean}`;
+};
 
 /* ---------- Hooks ---------- */
 
@@ -108,7 +116,6 @@ export default function ProjectModal({ open, onClose, project = {} }) {
 
   const current = media[idx];
 
-  // Use a dedicated portal root
   const portalRoot = usePortalRoot();
   if (!portalRoot) return null;
 
@@ -116,9 +123,9 @@ export default function ProjectModal({ open, onClose, project = {} }) {
     <AnimatePresence>
       {open && (
         <motion.div
-          className="modalOverlay projectModalOverlay" // <- keep old look + new safety
+          className="modalOverlay projectModalOverlay"
           style={{
-            position: "fixed",   // immune to any external overrides
+            position: "fixed",
             inset: 0,
             zIndex: 2000000001,
             pointerEvents: "auto",
@@ -134,7 +141,7 @@ export default function ProjectModal({ open, onClose, project = {} }) {
           aria-label={`${project.title || "Project"} details`}
         >
           <motion.div
-            className="modalCard projectModalCard" // <- keep glass + sizing tweaks
+            className="modalCard projectModalCard"
             onClick={(e) => e.stopPropagation()}
             initial={{ y: 20, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -198,7 +205,7 @@ export default function ProjectModal({ open, onClose, project = {} }) {
                         {m.type === "video" ? (
                           <div className="thumbVideo">▶</div>
                         ) : (
-                          <img src={m.poster || m.src} alt="" />
+                          <img src={withBase(m.poster || m.src)} alt="" />
                         )}
                       </button>
                     ))}
@@ -254,14 +261,12 @@ export default function ProjectModal({ open, onClose, project = {} }) {
 function MediaFrame({ item }) {
   if (!item) return null;
 
-  const common = {
-    style: {
-      width: "100%",
-      height: "min(60vh, 560px)",
-      objectFit: "cover",
-      display: "block",
-      background: "#0b0c10",
-    },
+  const baseStyle = {
+    width: "100%",
+    height: "min(64vh, 720px)",   // a bit taller and responsive
+    objectFit: "contain",          // <-- important: show full screenshots/videos
+    display: "block",
+    background: "#0b0c10",
   };
 
   switch (item.type) {
@@ -269,24 +274,26 @@ function MediaFrame({ item }) {
       return (
         <motion.video
           key={item.src}
-          {...common}
+          style={baseStyle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           controls
-          poster={item.poster}
-          src={item.src}
+          playsInline
+          preload="metadata"
+          poster={withBase(item.poster)}
+          src={withBase(item.src)}
         />
       );
     case "embed":
       return (
         <motion.iframe
           key={item.src}
-          {...common}
+          style={baseStyle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          src={item.src}
+          src={item.src} // likely absolute; don't prefix
           title={item.caption || "Embedded media"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -296,12 +303,14 @@ function MediaFrame({ item }) {
       return (
         <motion.img
           key={item.src}
-          {...common}
+          style={baseStyle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          src={item.src}
+          src={withBase(item.src)}
           alt={item.caption || ""}
+          loading="eager"
+          decoding="async"
         />
       );
   }

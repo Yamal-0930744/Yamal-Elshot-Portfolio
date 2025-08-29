@@ -1,22 +1,22 @@
-
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Center, Environment, Sparkles, useGLTF } from "@react-three/drei";
 import { useMotionValueEvent } from "framer-motion";
+import { asset } from "../utils/asset"; // <-- NEW
 
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
 const TUNE = {
-  yStart: 1.80,  
-  yEnd:   0.55,  
-  sStart: 0.155, 
-  sEnd:   0.138, 
-  z:      0.0,   
+  yStart: 1.80,
+  yEnd: 0.55,
+  sStart: 0.155,
+  sEnd: 0.138,
+  z: 0.0,
 };
 
 function GlassPlumbob({ p = 0 }) {
-  const gltf = useGLTF("/models/plumbob.glb");
+  const gltf = useGLTF(asset("models/plumbob.glb")); // <-- CHANGED
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const group = useRef();
 
@@ -60,7 +60,8 @@ function GlassPlumbob({ p = 0 }) {
     </group>
   );
 }
-useGLTF.preload("/models/plumbob.glb");
+useGLTF.preload(asset("models/plumbob.glb")); // <-- CHANGED
+
 function Stars({ p = 0 }) {
   const rot = useRef(0);
   useFrame((_, dt) => (rot.current += dt * 0.08));

@@ -1,9 +1,11 @@
-
-import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
+// src/components/CreativeJourneyMorph.jsx
+import React, { Suspense, useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
+import { asset } from "../utils/asset"; // ✅ prefix static files with BASE_URL
 
+// ---- tiny tween util ----
 function tween({ duration = 900, onUpdate, onComplete }) {
   let raf = 0;
   const start = performance.now();
@@ -17,11 +19,21 @@ function tween({ duration = 900, onUpdate, onComplete }) {
   return () => cancelAnimationFrame(raf);
 }
 
-const TARGET_MAX_DIM = 1.8; 
+// ---- paths resolved against BASE_URL (works on GitHub Pages) ----
+const PLUMBOB_PATH = asset("models/ps1_controller.glb");
+const NOTE_PATH    = asset("models/music_note.glb");
+const BRUSH_PATH   = asset("models/paint_brush.glb");
+
+// Drei preloads must use the resolved paths too
+useGLTF.preload(PLUMBOB_PATH);
+useGLTF.preload(NOTE_PATH);
+useGLTF.preload(BRUSH_PATH);
+
+const TARGET_MAX_DIM = 1.8;
 
 function RecenteredGLTF({
   src,
-  variant = "plumbob",
+  variant = "default",
   variantAdjust = 1.0,
   extraScale = 1.0,
   opacity = 1,
@@ -37,8 +49,7 @@ function RecenteredGLTF({
       o.castShadow = true;
       o.receiveShadow = false;
 
-        if (variant === "glassy") {
-
+      if (variant === "glassy") {
         o.material = new THREE.MeshPhysicalMaterial({
           color: new THREE.Color("#4ade80"),
           transmission: 1.0,
@@ -54,7 +65,6 @@ function RecenteredGLTF({
         });
         gather.push(o.material);
       } else {
-
         if (Array.isArray(o.material)) {
           o.material = o.material.map((m) => {
             const nm = m.clone();
@@ -105,40 +115,39 @@ function RecenteredGLTF({
   );
 }
 
-useGLTF.preload("/models/ps1_controller.glb");
-useGLTF.preload("/models/music_note.glb");
-useGLTF.preload("/models/paint_brush.glb");
-
 export default function CreativeJourneyMorph({
-  initial = "plumbob",
+  initial   = "plumbob",
   autoCycle = true,
-  interval = 4800,
-  plumbobSrc = "/models/ps1_controller.glb",
-  noteSrc = "/models/music_note.glb",
-  brushSrc = "/models/paint_brush.glb",
+  interval  = 4800,
+  // ✅ defaults use BASE_URL-safe paths
+  plumbobSrc = PLUMBOB_PATH,
+  noteSrc    = NOTE_PATH,
+  brushSrc   = BRUSH_PATH,
 }) {
   const VARIANT_VISUAL_ADJUST = {
-  default: 1.0,  
-  note: 0.8,
-  brush: 1.0,
-};
+    default: 1.0,
+    note: 0.8,
+    brush: 1.0,
+  };
 
   const MODELS = useMemo(
     () => [
-
       { key: "plumbob", variant: "default", src: plumbobSrc },
-      { key: "note",     variant: "note",    src: noteSrc },
-      { key: "brush",    variant: "brush",   src: brushSrc },
+      { key: "note",    variant: "note",    src: noteSrc },
+      { key: "brush",   variant: "brush",   src: brushSrc },
     ],
     [plumbobSrc, noteSrc, brushSrc]
   );
 
-
-  const startIndex = Math.max(0, MODELS.findIndex((m) => m.key === initial.toLowerCase()));
+  const startIndex = Math.max(
+    0,
+    MODELS.findIndex((m) => m.key === initial.toLowerCase())
+  );
   const [curr, setCurr] = useState(startIndex);
   const [prev, setPrev] = useState(null);
   const [fade, setFade] = useState(1);
 
+  // auto cycle
   useEffect(() => {
     if (!autoCycle) return;
     const id = setInterval(() => {
@@ -156,6 +165,7 @@ export default function CreativeJourneyMorph({
     return () => clearInterval(id);
   }, [autoCycle, curr, interval, MODELS.length]);
 
+  // arrow keys
   useEffect(() => {
     const onKey = (e) => {
       if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
@@ -229,9 +239,8 @@ export default function CreativeJourneyMorph({
           rotateSpeed={0.9}
           zoomSpeed={0.8}
           autoRotate
-          autoRotateSpeed={1}   
+          autoRotateSpeed={1}
         />
-
       </Canvas>
 
       <div

@@ -17,6 +17,14 @@ import SiteFooter from "../components/SiteFooter";
 // ✨ new: plumbob that follows into Contact and bursts
 import ContactPlumbobFX from "../components/ContactPlumbobFX";
 
+/* Prefix asset paths for GitHub Pages subfolder deploys */
+const withBase = (path = "") => {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path) || /^data:/i.test(path)) return path;
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  return `${base}/${path.replace(/^\/+/, "")}`;
+};
+
 export default function Home() {
   const heroRef = useRef(null);
   const profileRef = useRef(null);
@@ -112,13 +120,12 @@ export default function Home() {
         <div aria-hidden />
 
         <ProfileCard
-  imageSrc="/img/AboutPhoto.png"
-  title="Human First, Developer Second"
-  description={`I’m Yamal. Some peopl call me Yems - a full-stack developer with a passion for crafting interfaces that feel intuitive and alive. My happy place is where taste meets logic; I turn messy ideas into clean, good looking experiences. My focus is on learning, experimenting, and steadily improving, one project at a time.
+          imageSrc={withBase("/img/AboutPhoto.png")}
+          title="Human First, Developer Second"
+          description={`I’m Yamal — some people call me Yems — a full-stack developer with a passion for crafting interfaces that feel intuitive and alive. My happy place is where taste meets logic; I turn messy ideas into clean, good-looking experiences. My focus is on learning, experimenting, and steadily improving, one project at a time.
 
 creative thinker • visual taste + psychology-driven • detail-minded • collaborative • curious & always learning`}
-/>
-
+        />
       </section>
 
       <section id="journey" className="anchorSection" style={{ position: "relative" }}>
@@ -133,8 +140,10 @@ creative thinker • visual taste + psychology-driven • detail-minded • coll
         <StackOrbit />
       </section>
 
+      {/* overlay FX that follows into Contact & bursts at the end */}
       <ContactPlumbobFX progress={contactProgress} />
 
+      {/* CONTACT + Footer */}
       <section id="contact" ref={contactRef} className="anchorSection">
         <ContactSection />
       </section>

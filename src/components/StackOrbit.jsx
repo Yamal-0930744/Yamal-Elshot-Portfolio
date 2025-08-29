@@ -1,9 +1,16 @@
-
 import React, { Suspense, useMemo, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { useGLTF, Billboard, Text, Environment, Center, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 import { useInView, motion, useMotionValue, animate, useTransform } from "framer-motion";
+
+/* ---- path helper for GitHub Pages subpaths ---- */
+const withBase = (path = "") => {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path) || /^data:/i.test(path)) return path;
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  return `${base}/${path.replace(/^\/+/, "")}`;
+};
 
 /* ---- color constants ---- */
 const ACCENT = "#7be3a3";
@@ -17,23 +24,23 @@ function asNumber(v, fallback = 0) {
 
 /* ---- Data ---- */
 const PRIMARY_ITEMS = [
-  { icon: "/icons/python.svg" },
-  { icon: "/icons/html.svg" },
-  { icon: "/icons/css.svg" },
-  { icon: "/icons/react.svg" },
-  { icon: "/icons/threejs.svg" },
-  { icon: "/icons/js.svg" },
-  { icon: "/icons/github.svg" },
+  { icon: "/icons/python.svg", label: "Python" },
+  { icon: "/icons/html.svg",   label: "HTML" },
+  { icon: "/icons/css.svg",    label: "CSS" },
+  { icon: "/icons/react.svg",  label: "React" },
+  { icon: "/icons/threejs.svg",label: "Three.js" },
+  { icon: "/icons/js.svg",     label: "JavaScript" },
+  { icon: "/icons/github.svg", label: "GitHub" },
 ];
 
 const SECONDARY_ITEMS = [
-  { label: "Canva", icon: "/icons/canva.svg" },
-  { label: "Vite", icon: "/icons/vite.svg" },
-  { label: "SQLAlchemy", icon: "/icons/sqlalchemy.svg" },
-  { label: "AI", icon: "/icons/gpt.svg" },
-  { label: "REST", icon: "/icons/rest.svg" },
-  { label: "VS Code", icon: "/icons/vscode.svg" },
-  { label: "Postman", icon: "/icons/postman.svg" },
+  { label: "Canva",       icon: "/icons/canva.svg" },
+  { label: "Vite",        icon: "/icons/vite.svg" },
+  { label: "SQLAlchemy",  icon: "/icons/sqlalchemy.svg" },
+  { label: "AI",          icon: "/icons/gpt.svg" },
+  { label: "REST",        icon: "/icons/rest.svg" },
+  { label: "VS Code",     icon: "/icons/vscode.svg" },
+  { label: "Postman",     icon: "/icons/postman.svg" },
 ];
 
 /* =========================================================
@@ -46,9 +53,8 @@ function HeroLikeSparkles({ reentry, count = 64, radius = 1.05, thickness = 0.18
   const positions = useMemo(() => {
     const pos = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      // random point on sphere with small radial jitter (radius ± thickness/2)
       const theta = Math.random() * Math.PI * 2;
-      const u = Math.random() * 2 - 1; // cos(phi) uniform
+      const u = Math.random() * 2 - 1;
       const phi = Math.acos(u);
       const r = radius + (Math.random() - 0.5) * thickness;
 
@@ -65,16 +71,14 @@ function HeroLikeSparkles({ reentry, count = 64, radius = 1.05, thickness = 0.18
   }, [count, radius, thickness]);
 
   useFrame((state, dt) => {
-    // gentle drift
     if (ref.current) {
       ref.current.rotation.y += dt * 0.12;
       ref.current.rotation.x += dt * 0.03;
     }
-    // fade + tiny size pulse — same feel as hero
     if (mat.current) {
       const a = THREE.MathUtils.clamp(asNumber(reentry, 0), 0, 1);
       mat.current.opacity = 0.4 * a;
-      mat.current.size = 2.5 + Math.sin(state.clock.elapsedTime * 2.4) * 0.5; // pixels
+      mat.current.size = 2.5 + Math.sin(state.clock.elapsedTime * 2.4) * 0.5;
     }
   });
 
@@ -90,9 +94,9 @@ function HeroLikeSparkles({ reentry, count = 64, radius = 1.05, thickness = 0.18
       </bufferGeometry>
       <pointsMaterial
         ref={mat}
-        color="#bff7e8"           // pale mint like hero
-        size={2.5}               // pixel size (kept small to avoid blowouts)
-        sizeAttenuation={false}  // match hero: constant pixel size
+        color="#bff7e8"
+        size={2.5}
+        sizeAttenuation={false}
         transparent
         opacity={0}
         depthWrite={false}
@@ -105,14 +109,13 @@ function HeroLikeSparkles({ reentry, count = 64, radius = 1.05, thickness = 0.18
 
 /* ---------- Center plumbob (same glassy look as hero) ---------- */
 function MiniPlumbob({ baseScale = 0.14, reentry = 0, yOffset = 0 }) {
-  const gltf = useGLTF("/models/plumbob.glb");
+  const gltf = useGLTF(withBase("/models/plumbob.glb"));
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const group = useRef();
   const stars = useRef();
 
-  // same hero-like material + faint facet lines
   useMemo(() => {
-    const accent = new THREE.Color("#4ade80");
+    const accent = new THREE.Color(PLUMBOB_COLOR);
     scene.traverse((o) => {
       if (!o.isMesh) return;
       o.castShadow = true;
@@ -157,7 +160,6 @@ function MiniPlumbob({ baseScale = 0.14, reentry = 0, yOffset = 0 }) {
     const s = THREE.MathUtils.lerp(group.current.scale.x || baseScale, targetS, 0.12);
     group.current.scale.setScalar(s);
 
-    // very slow ambient orbit so sparkles feel like “stars around”
     if (stars.current) {
       stars.current.rotation.y += dt * 0.02;
       stars.current.rotation.x += dt * 0.005;
@@ -167,24 +169,20 @@ function MiniPlumbob({ baseScale = 0.14, reentry = 0, yOffset = 0 }) {
   return (
     <group ref={group}>
       <primitive object={scene} scale={baseScale} />
-
-      {/* ✅ Drei sparkles only — slowed & less noisy, surrounding the plumbob */}
       <group ref={stars}>
-        {/* inner ring/cluster */}
         <Sparkles
           count={16}
-          speed={0.04}           // slower motion
+          speed={0.04}
           size={1.0}
           opacity={0.22}
-          color="#7be3a3"        // same mint as hero
-          noise={0.15}           // less erratic
+          color="#7be3a3"
+          noise={0.15}
           scale={[1.2, 1.2, 1.2]}
           position={[0, 0.05, 0]}
         />
-        {/* outer, wider + dimmer */}
         <Sparkles
           count={22}
-          speed={0.03}           // even slower
+          speed={0.03}
           size={0.9}
           opacity={0.14}
           color="#7be3a3"
@@ -197,10 +195,9 @@ function MiniPlumbob({ baseScale = 0.14, reentry = 0, yOffset = 0 }) {
   );
 }
 
+useGLTF.preload(withBase("/models/plumbob.glb"));
 
-useGLTF.preload("/models/plumbob.glb");
-
-/* ---------- Accent orbit ring (unchanged) ---------- */
+/* ---------- Accent orbit ring ---------- */
 function OrbitRing({ reentry }) {
   const baseRef = useRef();
   const glowRef = useRef();
@@ -232,7 +229,8 @@ function OrbitRing({ reentry }) {
 
 /* ---------- One orbit item ---------- */
 function OrbitItem({ textureUrl, label, radius = 1.35, baseAngle = 0, speed = 0.22, reentry }) {
-  const tex = useLoader(THREE.TextureLoader, textureUrl);
+  const url = useMemo(() => withBase(textureUrl), [textureUrl]);
+  const tex = useLoader(THREE.TextureLoader, url);
   const ref = useRef();
   const ringMat = useRef();
   const textRef = useRef();
@@ -302,7 +300,7 @@ function StackChip({ icon, label, index, reentry }) {
   const y = useTransform(reentry, [0, enterStart, enterEnd, 1], [20, 20, 0, 0]);
   return (
     <motion.div className="stackChip" role="listitem" aria-label={label} style={{ opacity, y }}>
-      <img src={icon} alt="" />
+      <img src={withBase(icon)} alt={label} />
       <span>{label}</span>
     </motion.div>
   );
@@ -312,7 +310,6 @@ function StackChip({ icon, label, index, reentry }) {
 export default function StackOrbit() {
   const sectionRef = useRef(null);
 
-  // live in/out
   const inView = useInView(sectionRef, { amount: 0.6 });
   const reentry = useMotionValue(0);
 
@@ -365,12 +362,9 @@ export default function StackOrbit() {
           <Suspense fallback={null}>
             <group position={[0, -0.22, 0]}>
               <Center>
-
-                {/* accent ring + plumbob */}
                 <OrbitRing reentry={reentry} />
                 <MiniPlumbob baseScale={0.14} reentry={reentry} yOffset={-0.3} />
 
-                {/* orbiting badges */}
                 {PRIMARY_ITEMS.map((it, i) => (
                   <OrbitItem
                     key={`${it.icon}-${i}`}

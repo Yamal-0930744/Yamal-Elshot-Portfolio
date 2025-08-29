@@ -1,4 +1,4 @@
-
+// src/components/HeroPlumbob.jsx
 import { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Center, Environment, ContactShadows, Sparkles } from "@react-three/drei";
@@ -7,8 +7,18 @@ import { motion } from "framer-motion";
 
 function asNumber(v, f = 0) { return typeof v === "number" ? v : v?.get?.() ?? f; }
 
+// Prefix relative asset paths with Vite's BASE_URL (needed on GitHub Pages subpath)
+const withBase = (path = "") => {
+  if (!path) return path;
+  if (/^https?:\/\//i.test(path)) return path;
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+  const clean = path.replace(/^\/+/, "");
+  return `${base}/${clean}`;
+};
+
 function PlumbobModel({ baseScale = 0.22, spinFactor = 1, fly = { y: 0, z: 0 } }) {
-  const gltf = useGLTF("/models/plumbob.glb");
+  const modelUrl = withBase("/models/plumbob.glb");
+  const gltf = useGLTF(modelUrl);
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
   const group = useRef();
 
@@ -36,31 +46,25 @@ function PlumbobModel({ baseScale = 0.22, spinFactor = 1, fly = { y: 0, z: 0 } }
   }, [scene]);
 
   useFrame((_, dt) => {
-  // ramped spin: base speed bumped from 0.6 → 1.0 and guarded
-  const spin = Math.max(0.001, asNumber(spinFactor, 1));
-  scene.rotation.y += dt * 1.0 * spin; // try 1.2 if you want even more
+    const spin = Math.max(0.001, asNumber(spinFactor, 1));
+    scene.rotation.y += dt * 1.0 * spin;
 
-  if (!group.current) return;
-
-  // (optional) slightly quicker fly-out response: 0.08 → 0.10
-  const ty = asNumber(fly.y, 0);
-  const tz = asNumber(fly.z, 0);
-  group.current.position.y += (ty - group.current.position.y) * 0.10;
-  group.current.position.z += (tz - group.current.position.z) * 0.10;
-});
-
+    if (!group.current) return;
+    const ty = asNumber(fly.y, 0);
+    const tz = asNumber(fly.z, 0);
+    group.current.position.y += (ty - group.current.position.y) * 0.10;
+    group.current.position.z += (tz - group.current.position.z) * 0.10;
+  });
 
   return (
     <group ref={group}>
       <primitive object={scene} scale={baseScale} />
-
-      {/* Tighter, centered sparkles */}
       <Sparkles
         count={12}
         speed={0.12}
         size={1.2}
-        scale={[0.7, 1.0, 0.7]}   // keep them close
-        position={[0, 0.15, 0]}   // float a touch above center
+        scale={[0.7, 1.0, 0.7]}
+        position={[0, 0.15, 0]}
         opacity={0.28}
         color="#7be3a3"
         noise={0.6}
@@ -73,9 +77,8 @@ function ParallaxGroup({ offset = { x: 0, y: 0 }, children }) {
   const ref = useRef();
   const { mouse } = useThree();
   useFrame(() => {
-    // small, clamped wobble so it never runs away
-    const wobble = 0.15;              // max ± world units to add
-    const k = 0.12;                   // sensitivity
+    const wobble = 0.15;
+    const k = 0.12;
     const dx = THREE.MathUtils.clamp((mouse.x || 0) * k, -wobble, wobble);
     const dy = THREE.MathUtils.clamp((mouse.y || 0) * -k, -wobble, wobble);
     if (!ref.current) return;
@@ -127,4 +130,4 @@ export default function HeroPlumbob({
   );
 }
 
-useGLTF.preload("/models/plumbob.glb");
+useGLTF.preload(withBase("/models/plumbob.glb"));
