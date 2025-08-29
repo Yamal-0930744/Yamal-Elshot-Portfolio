@@ -4,7 +4,7 @@ export const projects = [
     title: "LogiCare – UI Redesign",
     subtitle: "From cluttered to clear",
     tags: ["UI/UX", "Design system", "React"],
-    cover: "/img/projects/logicare/logicarelogo.svg", // tile image
+    cover: "/img/projects/logicare/logicarelogo.svg", 
     isLogo: true,
     media: [
       { type: "image", src: "/img/projects/logicare/logicarebefore.png",  caption: "Original dashboard (before)" },
@@ -126,7 +126,7 @@ export const projects = [
 
   {
   id: "personality-app",
-  title: "Personality — Classroom Typing App",
+  title: "Personality - Classroom Typing App",
   subtitle: "Brand-first, interactive quiz for teachers",
   tags: ["Branding", "Animation", "UX"],
   cover: "/img/projects/personality/personalitylogo.svg",
@@ -159,7 +159,7 @@ export const projects = [
 
   {
   id: "blue-alien-game",
-  title: "Blue Alien — Cupcake Run",
+  title: "Blue Alien - Cupcake Run",
   subtitle: "First platformer, first team lead",
   tags: ["Python", "Pygame", "Game Design", "Art Direction"],
   cover: "/img/projects/bluealien/bluealien.svg", // or a key art image

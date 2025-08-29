@@ -1,10 +1,10 @@
-// src/components/CreativeJourney.jsx
+
 import React, { useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import ProjectModal from "./ProjectModal";
 
 const defaultImages = [
-  // swap with your own paths (any size; they’re cover-fitted)
+
   "/img/journey/painting.jpg",
   "/img/journey/beats.jpg",
   "/img/journey/photography.jpg",
@@ -42,10 +42,9 @@ export default function CreativeJourney({
     setModalOpen(true);
   };
 
-  // simple fan layout: tweak angles/offsets to taste
   const fan = useMemo(() => {
     const angles = [-12, -5, 4, 11, -2];
-    const spread = 24; // px offset between cards
+    const spread = 24; 
     return images.map((src, i) => ({
       src,
       angle: angles[i % angles.length],
@@ -55,7 +54,6 @@ export default function CreativeJourney({
     }));
   }, [images]);
 
-  // tilt on mouse (very subtle)
   const wrapRef = useRef(null);
   const handleMove = (e) => {
     const r = wrapRef.current?.getBoundingClientRect();
@@ -72,7 +70,6 @@ export default function CreativeJourney({
     wrapRef.current.style.setProperty("--ry", `0deg`);
   };
 
-  // Build a minimal project payload so clicking a card opens your nice modal
   const modalProject = useMemo(
     () => ({
       id: "creative-journey",
@@ -106,7 +103,6 @@ export default function CreativeJourney({
           </div>
         </div>
 
-        {/* Right: fanned deck */}
         <div
           className="deckWrap"
           ref={wrapRef}
@@ -141,13 +137,12 @@ export default function CreativeJourney({
         </div>
       </div>
 
-      {/* reuse your ProjectModal so images open large and you can swipe */}
       <ProjectModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
         project={{
           ...modalProject,
-          // start from the clicked index
+
           media: [
             ...modalProject.media.slice(modalIdx),
             ...modalProject.media.slice(0, modalIdx),

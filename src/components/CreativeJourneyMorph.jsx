@@ -1,10 +1,9 @@
-// src/components/CreativeJourneyMorph.jsx
+
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls, useGLTF } from "@react-three/drei";
 
-/* ---------- tiny tween helper (0..1) ---------- */
 function tween({ duration = 900, onUpdate, onComplete }) {
   let raf = 0;
   const start = performance.now();
@@ -18,8 +17,7 @@ function tween({ duration = 900, onUpdate, onComplete }) {
   return () => cancelAnimationFrame(raf);
 }
 
-/* ---------- recenter + auto-fit ---------- */
-const TARGET_MAX_DIM = 1.8; // world-units target for the largest side
+const TARGET_MAX_DIM = 1.8; 
 
 function RecenteredGLTF({
   src,
@@ -39,9 +37,8 @@ function RecenteredGLTF({
       o.castShadow = true;
       o.receiveShadow = false;
 
-      // only use the glassy override when variant === "glassy"
         if (variant === "glassy") {
-        // Custom glassy look for the plumbob
+
         o.material = new THREE.MeshPhysicalMaterial({
           color: new THREE.Color("#4ade80"),
           transmission: 1.0,
@@ -57,7 +54,7 @@ function RecenteredGLTF({
         });
         gather.push(o.material);
       } else {
-        // KEEP original materials for note/brush — preserve textures/colors
+
         if (Array.isArray(o.material)) {
           o.material = o.material.map((m) => {
             const nm = m.clone();
@@ -91,7 +88,6 @@ function RecenteredGLTF({
     return { root, scaleFit, materials: gather };
   }, [scene, variant]);
 
-  // Fade crossfade
   useEffect(() => {
     for (const m of materials) {
       m.transparent = true;
@@ -113,7 +109,6 @@ useGLTF.preload("/models/ps1_controller.glb");
 useGLTF.preload("/models/music_note.glb");
 useGLTF.preload("/models/paint_brush.glb");
 
-/* ---------- main morphing component ---------- */
 export default function CreativeJourneyMorph({
   initial = "plumbob",
   autoCycle = true,
@@ -123,14 +118,14 @@ export default function CreativeJourneyMorph({
   brushSrc = "/models/paint_brush.glb",
 }) {
   const VARIANT_VISUAL_ADJUST = {
-  default: 1.0,  // neutral scaling for controller
+  default: 1.0,  
   note: 0.8,
   brush: 1.0,
 };
 
   const MODELS = useMemo(
     () => [
-      // PS1 controller: keep original materials/textures
+
       { key: "plumbob", variant: "default", src: plumbobSrc },
       { key: "note",     variant: "note",    src: noteSrc },
       { key: "brush",    variant: "brush",   src: brushSrc },

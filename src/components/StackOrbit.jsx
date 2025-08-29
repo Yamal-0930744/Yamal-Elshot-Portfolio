@@ -1,4 +1,4 @@
-// src/components/StackOrbit.jsx
+
 import React, { Suspense, useMemo, useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useLoader } from "@react-three/fiber";
 import { useGLTF, Billboard, Text, Environment, Center, Sparkles } from "@react-three/drei";

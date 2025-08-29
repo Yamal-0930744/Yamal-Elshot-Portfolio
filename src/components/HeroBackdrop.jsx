@@ -1,4 +1,4 @@
-// src/components/HeroBackdrop.jsx
+
 import { motion, useMotionValue, useSpring, useTransform, useReducedMotion } from "framer-motion";
 import { useEffect } from "react";
 

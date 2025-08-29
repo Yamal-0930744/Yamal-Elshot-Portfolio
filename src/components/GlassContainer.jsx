@@ -1,4 +1,4 @@
-// src/components/GlassContainer.jsx
+
 import { motion } from "framer-motion";
 
 export default function GlassContainer({

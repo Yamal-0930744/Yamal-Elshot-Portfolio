@@ -1,4 +1,4 @@
-// src/components/HeroPlumbob.jsx
+
 import { Suspense, useMemo, useRef } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Center, Environment, ContactShadows, Sparkles } from "@react-three/drei";

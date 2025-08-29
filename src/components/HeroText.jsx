@@ -1,4 +1,4 @@
-// src/components/HeroText.jsx
+
 import { motion, useReducedMotion, useInView, useMotionValue, useTransform, animate } from "framer-motion";
 import React, { useEffect, useRef } from "react";
 

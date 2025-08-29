@@ -1,11 +1,10 @@
-// src/components/DashboardSection.jsx
+
 import { useMemo, useRef, useState } from "react";
 import { motion, useInView } from "framer-motion";
 import GlassContainer from "./GlassContainer";
 import ProjectModal from "./ProjectModal";
 import { projects } from "../data/projects";
 
-// small helper to vary hover/flash tints per card
 const tints = [
   { bg: "rgba(123,227,198,0.12)", ring: "rgba(123,227,198,0.45)", glow: "rgba(123,227,198,0.35)" }, // green
   { bg: "rgba(138,180,255,0.12)", ring: "rgba(138,180,255,0.45)", glow: "rgba(138,180,255,0.35)" }, // blue
@@ -13,7 +12,6 @@ const tints = [
   { bg: "rgba(255,99,146,0.12)",  ring: "rgba(255,99,146,0.45)",  glow: "rgba(255,99,146,0.35)"  }, // pink
 ];
 
-// chunk projects into pages (4 tiles/page matches your 12-col grid)
 const PAGE_SIZE = 4;
 const chunk = (arr, size) =>
   arr.reduce((pages, _, i) => (i % size ? pages : [...pages, arr.slice(i, i + size)]), []);

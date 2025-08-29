@@ -1,4 +1,4 @@
-// src/components/ContactPlumbobFX.jsx
+
 import React, { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -8,14 +8,13 @@ import { useMotionValueEvent } from "framer-motion";
 const clamp01 = (v) => Math.min(1, Math.max(0, v));
 
 const TUNE = {
-  yStart: 1.80,  // was 2.10  → lower start
-  yEnd:   0.55,  // was 1.30  → lower end (↓ moves bob down)
-  sStart: 0.155, // was 0.16
-  sEnd:   0.138, // was 0.14
-  z:      0.0,   // in case you want to push/pull later
+  yStart: 1.80,  
+  yEnd:   0.55,  
+  sStart: 0.155, 
+  sEnd:   0.138, 
+  z:      0.0,   
 };
 
-/** Glass plumbob: position/scale mapped directly from p (no easing lag) */
 function GlassPlumbob({ p = 0 }) {
   const gltf = useGLTF("/models/plumbob.glb");
   const scene = useMemo(() => gltf.scene.clone(true), [gltf.scene]);
@@ -44,7 +43,6 @@ function GlassPlumbob({ p = 0 }) {
   useFrame((_, dt) => {
     scene.rotation.y += dt * (0.55 + p * 2.1);
 
-    // ↓ lower Y by mapping to our tuned start/end (no easing lag)
     const y = THREE.MathUtils.lerp(TUNE.yStart, TUNE.yEnd, p);
     const s = THREE.MathUtils.lerp(TUNE.sStart, TUNE.sEnd, p);
 
@@ -56,7 +54,6 @@ function GlassPlumbob({ p = 0 }) {
 
   return (
     <group ref={group}>
-      {/* keep Center so the GLB stays framed, but it won't fight our Y/scale */}
       <Center>
         <primitive object={scene} />
       </Center>
@@ -64,8 +61,6 @@ function GlassPlumbob({ p = 0 }) {
   );
 }
 useGLTF.preload("/models/plumbob.glb");
-
-/** Stars */
 function Stars({ p = 0 }) {
   const rot = useRef(0);
   useFrame((_, dt) => (rot.current += dt * 0.08));

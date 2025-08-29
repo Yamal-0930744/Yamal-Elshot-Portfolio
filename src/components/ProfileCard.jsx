@@ -1,4 +1,4 @@
-// src/components/ProfileCard.jsx
+
 import "./ProfileCard.css";
 import { motion, useInView } from "framer-motion";
 import { useRef, useMemo } from "react";
