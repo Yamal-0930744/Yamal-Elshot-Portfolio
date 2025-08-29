@@ -2,17 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 
-/* ---------- path helper (needed for GitHub Pages subpaths) ---------- */
-const withBase = (path = "") => {
-  if (!path) return path;
-  if (/^https?:\/\//i.test(path) || /^data:/i.test(path)) return path; // leave absolute/data URIs
-  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
-  const clean = path.replace(/^\/+/, "");
-  return `${base}/${clean}`;
-};
-
 /* ---------- Hooks ---------- */
-
 function useKeyDown(active, handler) {
   useEffect(() => {
     if (!active) return;
@@ -22,12 +12,11 @@ function useKeyDown(active, handler) {
   }, [active, handler]);
 }
 
-/** Lock page scroll (iOS-safe): fix body, store/restore scrollY */
+/** Lock page scroll (iOS-safe) */
 function useBodyScrollLock(active) {
   const scrollYRef = useRef(0);
   useEffect(() => {
     if (!active) return;
-
     scrollYRef.current = window.scrollY || window.pageYOffset || 0;
 
     const prev = {
@@ -58,7 +47,7 @@ function useBodyScrollLock(active) {
   }, [active]);
 }
 
-/** Get/create a stable portal root with a huge z-index */
+/** Get/create a stable portal root */
 function usePortalRoot(id = "modal-root") {
   const ref = useRef(null);
   useEffect(() => {
@@ -78,11 +67,10 @@ function usePortalRoot(id = "modal-root") {
 }
 
 /* ---------- Component ---------- */
-
 export default function ProjectModal({ open, onClose, project = {} }) {
   useBodyScrollLock(!!open);
 
-  // Media list (fallback to cover)
+  // Use the media+cover exactly as provided by projects.js (already base-prefixed)
   const media = useMemo(() => {
     if (Array.isArray(project.media) && project.media.length) return project.media;
     if (project.cover) return [{ type: "image", src: project.cover, caption: project.title }];
@@ -90,29 +78,17 @@ export default function ProjectModal({ open, onClose, project = {} }) {
   }, [project]);
 
   const [idx, setIdx] = useState(0);
-  useEffect(() => {
-    if (open) setIdx(0);
-  }, [open, project?.id]);
+  useEffect(() => { if (open) setIdx(0); }, [open, project?.id]);
 
-  // Keyboard controls (ESC, arrows)
   useKeyDown(open, (e) => {
     if (e.key === "Escape") onClose?.();
     if (media.length > 1 && e.key === "ArrowRight") setIdx((i) => (i + 1) % media.length);
     if (media.length > 1 && e.key === "ArrowLeft")  setIdx((i) => (i - 1 + media.length) % media.length);
   });
 
-  // Safe text sections
-  const challenge =
-    project.sections?.challenge ??
-    project.subtitle ??
-    "What needed to be solved and why it mattered.";
-  const roadmap =
-    project.sections?.roadmap ??
-    project.content ??
-    "The approach: constraints, iterations, and the key technical/design choices.";
-  const results =
-    project.sections?.results ??
-    "Impact and outcomes — metrics, learnings, next steps.";
+  const challenge = project.sections?.challenge ?? project.subtitle ?? "What needed to be solved and why it mattered.";
+  const roadmap   = project.sections?.roadmap   ?? project.content  ?? "The approach: constraints, iterations, and key choices.";
+  const results   = project.sections?.results   ?? "Impact and outcomes — metrics, learnings, next steps.";
 
   const current = media[idx];
 
@@ -124,18 +100,11 @@ export default function ProjectModal({ open, onClose, project = {} }) {
       {open && (
         <motion.div
           className="modalOverlay projectModalOverlay"
-          style={{
-            position: "fixed",
-            inset: 0,
-            zIndex: 2000000001,
-            pointerEvents: "auto",
-          }}
+          style={{ position: "fixed", inset: 0, zIndex: 2000000001, pointerEvents: "auto" }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) onClose?.();
-          }}
+          onClick={(e) => { if (e.target === e.currentTarget) onClose?.(); }}
           role="dialog"
           aria-modal="true"
           aria-label={`${project.title || "Project"} details`}
@@ -149,20 +118,15 @@ export default function ProjectModal({ open, onClose, project = {} }) {
             transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
             style={{ pointerEvents: "auto" }}
           >
-            {/* Header */}
             <div className="modalHead">
               <div className="modalTitleWrap">
                 <h3 className="modalTitle">{project.title}</h3>
                 {project.subtitle && <p className="modalSubtitle">{project.subtitle}</p>}
               </div>
-              <button className="modalClose" aria-label="Close" onClick={onClose} type="button">
-                ×
-              </button>
+              <button className="modalClose" aria-label="Close" onClick={onClose} type="button">×</button>
             </div>
 
-            {/* Body: media + info */}
             <div className="modalBody">
-              {/* Media column */}
               <div className="modalGallery">
                 <div className="galleryMain">
                   <div className="galleryStage">
@@ -171,27 +135,12 @@ export default function ProjectModal({ open, onClose, project = {} }) {
 
                   {media.length > 1 && (
                     <>
-                      <button
-                        className="galleryArrow left"
-                        aria-label="Previous media"
-                        onClick={() => setIdx((i) => (i - 1 + media.length) % media.length)}
-                        type="button"
-                      >
-                        ‹
-                      </button>
-                      <button
-                        className="galleryArrow right"
-                        aria-label="Next media"
-                        onClick={() => setIdx((i) => (i + 1) % media.length)}
-                        type="button"
-                      >
-                        ›
-                      </button>
+                      <button className="galleryArrow left"  aria-label="Previous media" onClick={() => setIdx((i) => (i - 1 + media.length) % media.length)} type="button">‹</button>
+                      <button className="galleryArrow right" aria-label="Next media"     onClick={() => setIdx((i) => (i + 1) % media.length)}                       type="button">›</button>
                     </>
                   )}
                 </div>
 
-                {/* Thumbnails */}
                 {media.length > 1 && (
                   <div className="galleryThumbs">
                     {media.map((m, i) => (
@@ -205,7 +154,7 @@ export default function ProjectModal({ open, onClose, project = {} }) {
                         {m.type === "video" ? (
                           <div className="thumbVideo">▶</div>
                         ) : (
-                          <img src={withBase(m.poster || m.src)} alt="" />
+                          <img src={m.poster || m.src} alt="" />
                         )}
                       </button>
                     ))}
@@ -213,16 +162,10 @@ export default function ProjectModal({ open, onClose, project = {} }) {
                 )}
               </div>
 
-              {/* Info column */}
               <div className="infoPanel" style={{ overflow: "auto" }}>
-                {/* Tags row */}
                 {Array.isArray(project.tags) && project.tags.length > 0 && (
                   <div className="chipsRow" style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                    {project.tags.slice(0, 6).map((t) => (
-                      <span key={t} className="tag">
-                        {t}
-                      </span>
-                    ))}
+                    {project.tags.slice(0, 6).map((t) => <span key={t} className="tag">{t}</span>)}
                   </div>
                 )}
 
@@ -230,17 +173,10 @@ export default function ProjectModal({ open, onClose, project = {} }) {
                 <Section title="Roadmap"   body={roadmap} />
                 <Section title="Results"   body={results} />
 
-                {/* Links */}
                 {Array.isArray(project.links) && project.links.length > 0 && (
                   <div className="linkRow" style={{ marginTop: 12, display: "flex", gap: 10, flexWrap: "wrap" }}>
                     {project.links.map((l) => (
-                      <a
-                        key={l.href || l.label}
-                        href={l.href || "#"}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="ghostBtn"
-                      >
+                      <a key={l.href || l.label} href={l.href || "#"} target="_blank" rel="noreferrer" className="ghostBtn">
                         {l.label || "Open"}
                       </a>
                     ))}
@@ -257,14 +193,13 @@ export default function ProjectModal({ open, onClose, project = {} }) {
 }
 
 /* ---------- helpers ---------- */
-
 function MediaFrame({ item }) {
   if (!item) return null;
 
   const baseStyle = {
     width: "100%",
-    height: "min(64vh, 720px)",   // a bit taller and responsive
-    objectFit: "contain",          // <-- important: show full screenshots/videos
+    height: "min(64vh, 720px)",
+    objectFit: "contain",
     display: "block",
     background: "#0b0c10",
   };
@@ -281,8 +216,8 @@ function MediaFrame({ item }) {
           controls
           playsInline
           preload="metadata"
-          poster={withBase(item.poster)}
-          src={withBase(item.src)}
+          poster={item.poster}
+          src={item.src}
         />
       );
     case "embed":
@@ -293,7 +228,7 @@ function MediaFrame({ item }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          src={item.src} // likely absolute; don't prefix
+          src={item.src}
           title={item.caption || "Embedded media"}
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
@@ -307,7 +242,7 @@ function MediaFrame({ item }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          src={withBase(item.src)}
+          src={item.src}
           alt={item.caption || ""}
           loading="eager"
           decoding="async"
@@ -320,12 +255,7 @@ function Section({ title, body }) {
   const bodyNode = Array.isArray(body)
     ? listNode(body)
     : typeof body === "string" && body.trim().includes("\n")
-    ? listNode(
-        body
-          .split("\n")
-          .map((s) => s.replace(/^\s*[-•]\s*/, "").trim())
-          .filter(Boolean)
-      )
+    ? listNode(body.split("\n").map((s) => s.replace(/^\s*[-•]\s*/, "").trim()).filter(Boolean))
     : typeof body === "string"
     ? <p style={{ margin: "6px 0 0 0", color: "#cfd3db" }}>{body}</p>
     : null;
@@ -341,11 +271,7 @@ function Section({ title, body }) {
 function listNode(items) {
   return (
     <ul style={{ margin: "6px 0 0 1rem", color: "#cfd3db" }}>
-      {items.map((it, i) => (
-        <li key={i} style={{ margin: "2px 0" }}>
-          {it}
-        </li>
-      ))}
+      {items.map((it, i) => <li key={i} style={{ margin: "2px 0" }}>{it}</li>)}
     </ul>
   );
 }
