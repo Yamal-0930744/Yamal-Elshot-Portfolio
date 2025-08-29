@@ -1649,3 +1649,171 @@ html { scroll-behavior: smooth; }
   height: auto !important;
   object-fit: contain !important;   /* <-- key: no crop */
 }
+
+/* =========================
+   RESPONSIVE PACK — drop-in
+   ========================= */
+
+/* ---------- XL DESKTOPS (≥ 1440px) ---------- */
+@media (min-width: 1440px){
+  :root{
+    --header-h: 92px;
+    --dash-gutter: clamp(18px, 2vw, 36px);
+  }
+
+  .heroText{ bottom: 28vh; max-width: 1200px; }
+  .gridDash{ gap: 1.35rem; }
+  .tile:nth-child(1),
+  .tile:nth-child(2){ min-height: 360px; }
+  .tileImg{ height: 180px; }
+  .stackCanvasPlain{ height: clamp(560px, 58vh, 760px); }
+}
+
+/* ---------- LARGE / STANDARD DESKTOPS (1200–1439px) ---------- */
+@media (max-width: 1439px){
+  :root{ --header-h: 84px; }
+  .heroText{ bottom: 24vh; }
+  .stackSceneOverlay{ max-width: min(760px, 52vw); }
+  .workOverlay{ max-width: min(720px, 48vw); }
+}
+
+/* ---------- LAPTOPS / LG (≤ 1200px) ---------- */
+@media (max-width: 1200px){
+  .siteHeader-inner{ padding-inline: clamp(12px, 3vw, 40px); }
+  .navList{ gap: clamp(12px, 1.6vw, 22px); flex-wrap: wrap; }
+  .gridDash{ gap: 1rem; }
+  .tile{ min-height: 230px; }
+  .tileImg{ height: 150px; }
+  .stackCanvasWrap{ height: 480px; }
+  .stackSceneOverlay{ left: clamp(16px, 4vw, 60px); top: clamp(28px, 9vh, 100px); max-width: min(680px, 56vw); }
+  .workOverlay{ right: clamp(16px, 4vw, 60px); bottom: clamp(16px, 8vh, 72px); max-width: min(640px, 52vw); }
+}
+
+/* ---------- TABLETS / MD (≤ 900px) ---------- */
+@media (max-width: 900px){
+  :root{ --header-h: 76px; }
+
+  /* Header spacing & nav readability */
+  .siteHeader-inner{ min-height: 58px; }
+  .navList{ gap: 14px; }
+  .navList .navLink{ font-size: .96rem; }
+
+  /* Hero text a bit higher so the 3D stays visible */
+  .heroText{ bottom: 22vh; padding: 1.2rem; }
+
+  /* Work grid compaction already handled; tighten gaps */
+  .gridDash{ gap: .9rem; }
+  .tileImg{ height: 140px; }
+
+  /* Overlays: keep inside safe text width */
+  .stackSceneOverlay{ left: 16px; top: 12vh; max-width: 86vw; }
+  .workOverlay{ right: 16px; bottom: 10vh; max-width: 86vw; }
+
+  /* Modal: single-column content (you already switch at 960px; reinforce here) */
+  .modalBody{ grid-template-columns: 1fr; }
+}
+
+/* ---------- PHONES / SM (≤ 640px) ---------- */
+@media (max-width: 640px){
+  :root{
+    --header-h: 66px;
+    --dash-gutter: clamp(10px, 4vw, 16px);
+  }
+
+  /* Header compact */
+  .siteHeader-inner{ padding-inline: clamp(10px, 4vw, 18px); }
+  .brandText{ font-size: 1.02rem; }
+  .navList{ gap: 12px; }
+  .navList .navLink{ font-size: .94rem; }
+
+  /* Hero */
+  .heroText{
+    left: 16px;
+    bottom: 20vh;
+    width: calc(100vw - 32px);
+    padding: 1rem;
+  }
+  .heroArrow{ width: 34px; height: 34px; }
+
+  /* Grid */
+  .gridDash{ grid-template-columns: 1fr; gap: .8rem; }
+  .tile{ min-height: 210px; }
+  .tileImg{ height: 130px; }
+
+  /* Headline slot spans full width */
+  .gridHeadlineSlot{ grid-column: 1 / -1; min-height: 180px; padding: 1rem; }
+
+  /* Stack / chips already reduce; trim paddings */
+  .stackOrbit{ padding: 3.5rem 4vw; }
+  .stackChip{ padding: .55rem .7rem; }
+  .stackCanvasWrap{ height: 420px; }
+  .stackCanvasPlain{ height: clamp(500px, 70vh, 720px); }
+
+  /* Journey */
+  .journeySection{ padding: 4rem 4vw; }
+  .journeyCols{ grid-template-columns: 1fr; gap: 12px; }
+
+  /* Modal: mobile-friendly full-height card */
+  .modalOverlay{ padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left)); }
+  .modalCard{
+    width: 100vw;
+    max-height: 94vh;
+    border-radius: 0;
+  }
+  .modalHead{ padding: 12px; }
+  .modalTitle{ font-size: 1.12rem; }
+  .modalClose{ width: 34px; height: 34px; }
+
+  /* Gallery stage: a touch taller on phones */
+  .galleryMain{ height: clamp(280px, 56vh, 640px); }
+  .thumb{ width: 68px; height: 48px; }
+
+  /* Carousel arrows smaller and inset */
+  .dashArrow{ width: 40px; height: 40px; font-size: 24px; }
+  .dashArrow.left{ left: calc(6px + var(--dash-gutter)); }
+  .dashArrow.right{ right: calc(6px + var(--dash-gutter)); }
+}
+
+/* ---------- TINY PHONES (≤ 420px) ---------- */
+@media (max-width: 420px){
+  .heroText{ bottom: 18vh; padding: .9rem; }
+  .heroText h1{ letter-spacing: .02em; }
+  .tileImg{ height: 120px; }
+  .tileBody{ padding: .85rem; }
+  .contactCard{ padding: 1rem; }
+  .ctaPrimary, .ctaGhost{ padding: .5rem .8rem; }
+  .social{ width: 34px; height: 34px; }
+}
+
+/* ---------- PHONE LANDSCAPE / SHORT VIEWPORTS ---------- */
+@media (max-height: 540px) and (orientation: landscape){
+  :root{ --header-h: 58px; }
+
+  .heroText{ bottom: 14vh; padding: .8rem; }
+  .heroArrow{ display: none; }
+
+  /* Make modal stage less tall so header isn’t pushed off */
+  .galleryMain{ height: clamp(220px, 54vh, 520px); }
+}
+
+/* ---------- HIGH-DPI SAFE-AREA POLISH ---------- */
+@media (max-width: 640px){
+  .siteHeader{ padding-top: env(safe-area-inset-top); }
+  .siteFooter{ padding-bottom: calc(1.2rem + env(safe-area-inset-bottom)); }
+}
+
+/* ---------- REDUCED MOTION: dampen hover lifts on touch-ish widths ---------- */
+@media (max-width: 900px) and (hover: none){
+  .glass:hover,
+  #work .gridDash .tile:hover{
+    transform: none;
+    box-shadow: 0 8px 26px rgba(0,0,0,.22);
+  }
+}
+
+/* ---------- ULTRAWIDE (≥ 1800px): breathe more ---------- */
+@media (min-width: 1800px){
+  .heroText{ bottom: 30vh; left: clamp(24px, 6vw, 120px); }
+  .stackCanvasPlain{ height: clamp(620px, 52vh, 860px); }
+  .gridDash{ gap: 1.45rem; }
+}
