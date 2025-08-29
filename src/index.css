@@ -2019,3 +2019,79 @@ html { scroll-behavior: smooth; }
   .tileImg{ height: 130px; }
   .gridHeadlineSlot{ grid-column: 1 / -1; }
 }
+
+/* =========================================
+   MOBILE FIX PACK (paste at the very end)
+   ========================================= */
+
+/* 1) ProfileCard — stack on phones: image first, text below */
+@media (max-width: 640px){
+  /* container */
+  .profileCard,
+  [class*="profile"][class*="card"]{
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;      /* media | text */
+    gap: .75rem;
+    max-height: 92vh;                  /* fit on screen */
+    overflow: hidden;                   /* inner scroll on text only */
+  }
+
+  /* media (first) — supports either a wrapper .profileMedia or a direct <img> */
+  .profileCard .profileMedia,
+  [class*="profile"][class*="card"] .profileMedia,
+  .profileCard > img:first-child,
+  [class*="profile"][class*="card"] > img:first-child{
+    order: 1;
+    width: 100%;
+    max-height: 44vh;                   /* show a good chunk of the photo */
+    overflow: hidden;
+    border-radius: 2px;
+  }
+  .profileCard .profileMedia img,
+  [class*="profile"][class*="card"] .profileMedia img,
+  .profileCard > img:first-child,
+  [class*="profile"][class*="card"] > img:first-child{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;                  /* crop nicely */
+    display: block;
+  }
+
+  /* text (second) */
+  .profileBody,
+  .profileCard .profileBody,
+  [class*="profile"][class*="card"] .profileBody{
+    order: 2;
+    overflow: auto;                     /* scroll only the copy if long */
+    padding: .9rem 1rem 1.1rem;
+    max-height: calc(92vh - var(--header-h) - 44vh - 16px);
+  }
+}
+
+/* 2) DashboardSection — force single column on phones */
+@media (max-width: 767px){
+  .gridDash{
+    grid-template-columns: 1fr !important;
+    gap: .85rem;
+  }
+  .gridDash .tile{
+    grid-column: 1 / -1 !important;     /* ignore nth-child spans */
+    min-height: 210px;
+  }
+  .gridDash .tileImg{ height: 130px; }
+}
+
+/* 3) Plumbob canvas — make sure the hero fills & no clipping (CSS side) */
+@media (max-width: 640px){
+  .hero3d{
+    overflow: visible;
+  }
+  .hero3d > canvas{
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    height: 100% !important;
+    display: block;
+  }
+}

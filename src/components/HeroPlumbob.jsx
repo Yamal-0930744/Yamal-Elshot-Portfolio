@@ -1,5 +1,5 @@
 // src/components/HeroPlumbob.jsx
-import { Suspense, useMemo, useRef } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useGLTF, Center, Environment, ContactShadows, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
@@ -15,6 +15,83 @@ const withBase = (path = "") => {
   const clean = path.replace(/^\/+/, "");
   return `${base}/${clean}`;
 };
+
+/* ---------------------------
+   RESPONSIVE TUNING
+   - keeps plumbob bottom-right on small screens
+   - reduces parallax + slightly shrinks on phones
+----------------------------*/
+function usePlumbobResponsive({
+  defaultOffset = { x: 0.52, y: 0.08 },
+  defaultScale = 0.22,
+  defaultCam = [0, 0.7, 2.6],
+}) {
+  const [state, setState] = useState({
+    offset: defaultOffset,
+    scale: defaultScale,
+    cam: defaultCam,
+    k: 0.12,
+    wobble: 0.15,
+  });
+
+  useEffect(() => {
+    const compute = () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      // Defaults (desktop)
+      let offset = { ...defaultOffset };
+      let scale = defaultScale;
+      let cam = [...defaultCam];
+      let k = 0.12;
+      let wobble = 0.15;
+
+      if (w <= 640) {
+        // Phones: keep bottom-right but not off-screen
+        offset = { x: 0.16, y: -0.10 };   // right & slightly down
+        scale = Math.min(defaultScale, 0.19);
+        cam = [0, 0.68, 2.8];
+        k = 0.08; wobble = 0.10;          // calmer parallax
+      } else if (w <= 1023) {
+        // Tablets: a bit right, near baseline
+        offset = { x: 0.32, y: -0.02 };
+        scale = Math.min(defaultScale, 0.205);
+        cam = [0.05, 0.7, 2.7];
+        k = 0.10; wobble = 0.12;
+      } else if (w >= 1800) {
+        // Ultrawide: breathe a touch
+        offset = { x: 0.58, y: 0.10 };
+        scale = defaultScale * 1.05;
+        cam = [0, 0.72, 2.8];
+      }
+
+      // Very short viewports (landscape phones/small laptops): nudge up a bit
+      if (h <= 540) {
+        offset = { x: offset.x, y: Math.min(offset.y + 0.04, 0.06) };
+        k = Math.min(k, 0.08);
+        wobble = Math.min(wobble, 0.10);
+      }
+
+      setState({ offset, scale, cam, k, wobble });
+    };
+
+    compute();
+    window.addEventListener("resize", compute, { passive: true });
+    return () => window.removeEventListener("resize", compute);
+  }, [defaultOffset, defaultScale, defaultCam]);
+
+  return state;
+}
+
+/* Update the R3F camera when settings change */
+function TuneCamera({ position = [0, 0.7, 2.6] }) {
+  const { camera } = useThree();
+  useEffect(() => {
+    camera.position.set(position[0], position[1], position[2]);
+    camera.lookAt(0, 0, 0);
+  }, [camera, position]);
+  return null;
+}
 
 function PlumbobModel({ baseScale = 0.22, spinFactor = 1, fly = { y: 0, z: 0 } }) {
   const modelUrl = withBase("/models/plumbob.glb");
@@ -32,7 +109,7 @@ function PlumbobModel({ baseScale = 0.22, spinFactor = 1, fly = { y: 0, z: 0 } }
         roughness: 0.22, metalness: 0.25, clearcoat: 0.15, clearcoatRoughness: 0.55,
         attenuationColor: accent, attenuationDistance: 7, envMapIntensity: 1,
       });
-      // very faint facet lines
+      // faint facet lines
       try {
         const eg = new THREE.EdgesGeometry(o.geometry, 25);
         const lines = new THREE.LineSegments(
@@ -73,12 +150,11 @@ function PlumbobModel({ baseScale = 0.22, spinFactor = 1, fly = { y: 0, z: 0 } }
   );
 }
 
-function ParallaxGroup({ offset = { x: 0, y: 0 }, children }) {
+/* Parallax group with tunable intensity */
+function ParallaxGroup({ offset = { x: 0, y: 0 }, k = 0.12, wobble = 0.15, children }) {
   const ref = useRef();
   const { mouse } = useThree();
   useFrame(() => {
-    const wobble = 0.15;
-    const k = 0.12;
     const dx = THREE.MathUtils.clamp((mouse.x || 0) * k, -wobble, wobble);
     const dy = THREE.MathUtils.clamp((mouse.y || 0) * -k, -wobble, wobble);
     if (!ref.current) return;
@@ -93,17 +169,36 @@ export default function HeroPlumbob({
   flyY = 0,
   flyZ = 0,
   opacity = 1,
-  offset = { x: 0.52, y: 0.08 },
+  offset = { x: 0.52, y: 0.08 },   // desktop default (right-ish, slightly up)
   baseScale = 0.22,
 }) {
+  // Responsive values for offset/scale/camera/parallax
+  const { offset: rOffset, scale: rScale, cam, k, wobble } = usePlumbobResponsive({
+    defaultOffset: offset,
+    defaultScale: baseScale,
+    defaultCam: [0, 0.7, 2.6],
+  });
+
   return (
-    <motion.div style={{ position: "fixed", inset: 0, width: "100%", height: "100%", opacity, pointerEvents: "none", zIndex: 1 }}>
+    <motion.div
+      style={{
+        position: "fixed",
+        inset: 0,
+        width: "100%",
+        height: "100%",
+        opacity,
+        pointerEvents: "none",
+        zIndex: 1,
+      }}
+    >
       <Canvas
         dpr={[1, 1.75]}
         camera={{ position: [0, 0.7, 2.6], fov: 35 }}
         gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, outputColorSpace: THREE.SRGBColorSpace }}
         shadows
       >
+        <TuneCamera position={cam} />
+
         <ambientLight intensity={0.35} />
         <directionalLight position={[3, 5, 4]} intensity={0.9} color="#fff2e0" castShadow />
         <directionalLight position={[-2, 2, -2]} intensity={0.45} color="#dff8ff" />
@@ -112,13 +207,13 @@ export default function HeroPlumbob({
 
         <Suspense fallback={null}>
           <Center>
-            <ParallaxGroup offset={offset}>
+            <ParallaxGroup offset={rOffset} k={k} wobble={wobble}>
               <motion.group
                 initial={{ scale: 0.92, opacity: 0 }}
                 animate={{ scale: [1, 1.13, 1, 0.93, 1], opacity: 1 }}
                 transition={{ duration: 1.4, ease: "easeInOut", repeat: Infinity, repeatType: "loop" }}
               >
-                <PlumbobModel baseScale={baseScale} spinFactor={spinFactor} fly={{ y: flyY, z: flyZ }} />
+                <PlumbobModel baseScale={rScale} spinFactor={spinFactor} fly={{ y: flyY, z: flyZ }} />
               </motion.group>
             </ParallaxGroup>
           </Center>
