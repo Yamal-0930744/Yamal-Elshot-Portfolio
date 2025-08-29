@@ -5,12 +5,13 @@ import GlassContainer from "./GlassContainer";
 import ProjectModal from "./ProjectModal";
 import { projects } from "../data/projects";
 
-// helper: prefix relative asset paths with Vite's BASE_URL (needed on GitHub Pages subpath)
+/* Prefix relative asset paths with Vite's BASE_URL (needed on GitHub Pages). */
 const withBase = (path = "") => {
   if (!path) return path;
-  if (/^https?:\/\//i.test(path)) return path; // external URL
-  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
-  const clean = path.replace(/^\/+/, "");
+  // leave absolute/http(s), protocol-relative (//), data: and blob: alone
+  if (/^(?:[a-z]+:)?\/\//i.test(path) || /^data:|^blob:/i.test(path)) return path;
+  const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
+  const clean = String(path).replace(/^\/+/, "");
   return `${base}/${clean}`;
 };
 
