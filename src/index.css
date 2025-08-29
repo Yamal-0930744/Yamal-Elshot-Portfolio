@@ -1817,3 +1817,205 @@ html { scroll-behavior: smooth; }
   .stackCanvasPlain{ height: clamp(620px, 52vh, 860px); }
   .gridDash{ gap: 1.45rem; }
 }
+
+/* ===========================================================
+   RESPONSIVE MASTER LAYER (drop at the very end of your CSS)
+   - Covers ultrawide → tiny phones, portrait/landscape
+   - Includes container queries for nested layouts
+   =========================================================== */
+
+/* ---------- FLUID TWEAKS THAT HELP EVERYWHERE ---------- */
+:root{
+  /* lets us tune vertical offsets across sizes */
+  --hero-bottom-desktop: 25vh;
+  --hero-bottom-tablet: 22vh;
+  --hero-bottom-phone: 20vh;
+}
+
+/* Give the grid its own query context (works inside carousels) */
+.gridDash{ container-type: inline-size; }
+
+/* ---------- ULTRAWIDE (≥ 1800px) ---------- */
+@media (min-width: 1800px){
+  .heroText{ left: clamp(24px, 6vw, 120px); bottom: 30vh; max-width: 1280px; }
+  .stackCanvasPlain{ height: clamp(640px, 52vh, 880px); }
+  .gridDash{ gap: 1.5rem; }
+  .tile:nth-child(1),
+  .tile:nth-child(2){ min-height: 380px; }
+  .tileImg{ height: 190px; }
+}
+
+/* ---------- XL DESKTOPS (1440–1799px) ---------- */
+@media (min-width: 1440px) and (max-width: 1799px){
+  .heroText{ bottom: 28vh; max-width: 1200px; }
+  .tileImg{ height: 180px; }
+  .stackCanvasPlain{ height: clamp(560px, 58vh, 760px); }
+}
+
+/* ---------- LARGE DESKTOPS / LAPTOPS (1200–1439px) ---------- */
+@media (max-width: 1439px){
+  .heroText{ bottom: var(--hero-bottom-desktop); }
+  .workOverlay{ max-width: min(720px, 50vw); }
+  .stackSceneOverlay{ max-width: min(740px, 52vw); }
+  .gridDash{ gap: 1.1rem; }
+}
+
+/* ---------- DESKTOP COMPACT (1100–1199px) ---------- */
+@media (max-width: 1199px){
+  .siteHeader-inner{ padding-inline: clamp(12px, 3vw, 40px); }
+  .navList{ gap: clamp(12px, 1.6vw, 22px); flex-wrap: wrap; }
+  .tileImg{ height: 160px; }
+  .stackCanvasWrap{ height: 480px; }
+}
+
+/* ---------- TABLETS LANDSCAPE (1024–1099px) ---------- */
+@media (max-width: 1099px){
+  .heroText{ left: clamp(14px, 4vw, 48px); bottom: 23vh; }
+  .workOverlay,
+  .stackSceneOverlay{ max-width: 86vw; }
+}
+
+/* ---------- TABLETS / iPad PORTRAIT (768–1023px) ---------- */
+@media (max-width: 1023px){
+  :root{ --header-h: 76px; }
+  .siteHeader-inner{ min-height: 58px; }
+  .navList .navLink{ font-size: .96rem; }
+
+  .heroText{
+    bottom: var(--hero-bottom-tablet);
+    padding: 1.2rem;
+    width: min(94vw, 980px);
+  }
+
+  /* Grid gets denser but still 2-up for small tiles */
+  .gridDash{ gap: 1rem; }
+  .tileImg{ height: 150px; }
+
+  /* Modal: go single column earlier for comfort */
+  .modalBody{ grid-template-columns: 1fr; }
+}
+
+/* ---------- PHONES LARGE (641–767px) ---------- */
+@media (max-width: 767px){
+  :root{ --header-h: 70px; }
+  .siteHeader-inner{ padding-inline: clamp(10px, 4vw, 20px); }
+  .heroText{
+    left: 16px; bottom: 21vh;
+    width: calc(100vw - 32px); padding: 1rem;
+  }
+  .stackOrbit{ padding: 3.8rem 4vw; }
+  .journeySection{ padding: 4.2rem 4vw; }
+  .journeyCols{ grid-template-columns: 1fr; gap: 14px; }
+
+  /* Chips comfortably tap-able */
+  .stackChip{ padding: .6rem .75rem; }
+}
+
+/* ---------- PHONES / CORE MOBILE (≤ 640px) ---------- */
+@media (max-width: 640px){
+  :root{
+    --header-h: 66px;
+    --dash-gutter: clamp(10px, 4vw, 16px);
+  }
+
+  /* Header compact */
+  .brandText{ font-size: 1.02rem; }
+  .navList{ gap: 12px; }
+  .navList .navLink{ font-size: .94rem; }
+
+  /* Hero */
+  .heroText{ bottom: var(--hero-bottom-phone); }
+  .heroArrow{ width: 34px; height: 34px; }
+
+  /* Work grid → single column */
+  .gridDash{ grid-template-columns: 1fr; gap: .85rem; }
+  .tile{ min-height: 210px; }
+  .tileImg{ height: 130px; }
+
+  /* Headline slot full width */
+  .gridHeadlineSlot{ grid-column: 1 / -1; min-height: 180px; padding: 1rem; }
+
+  /* Canvas wells */
+  .stackCanvasWrap{ height: 420px; }
+  .stackCanvasPlain{ height: clamp(500px, 70vh, 720px); }
+
+  /* Modal: mobile fullscreen feel + safe areas */
+  .modalOverlay{
+    padding: max(8px, env(safe-area-inset-top))
+             max(8px, env(safe-area-inset-right))
+             max(8px, env(safe-area-inset-bottom))
+             max(8px, env(safe-area-inset-left));
+  }
+  .modalCard{
+    width: 100vw; max-height: 94vh; border-radius: 0;
+  }
+  .modalHead{ padding: 12px; }
+  .modalTitle{ font-size: 1.12rem; }
+  .modalClose{ width: 34px; height: 34px; }
+
+  /* Gallery stage a touch taller on phones */
+  .galleryMain{ height: clamp(280px, 56vh, 640px); }
+  .thumb{ width: 68px; height: 48px; }
+
+  /* Carousel arrows smaller/inset */
+  .dashArrow{ width: 40px; height: 40px; font-size: 24px; }
+  .dashArrow.left{ left: calc(6px + var(--dash-gutter)); }
+  .dashArrow.right{ right: calc(6px + var(--dash-gutter)); }
+}
+
+/* ---------- TINY PHONES (≤ 420px) ---------- */
+@media (max-width: 420px){
+  .heroText{ bottom: 18vh; padding: .9rem; }
+  .heroText h1{ letter-spacing: .02em; }
+  .tileImg{ height: 120px; }
+  .tileBody{ padding: .85rem; }
+  .contactCard{ padding: 1rem; }
+  .ctaPrimary, .ctaGhost{ padding: .5rem .8rem; }
+  .social{ width: 34px; height: 34px; }
+}
+
+/* ---------- LANDSCAPE / SHORT VIEWPORTS ---------- */
+@media (max-height: 740px){
+  .heroText{ bottom: 18vh; }
+  .heroArrow{ display: none; }
+  .galleryMain{ height: clamp(240px, 54vh, 560px); }
+}
+@media (max-height: 540px) and (orientation: landscape){
+  :root{ --header-h: 58px; }
+  .heroText{ bottom: 14vh; padding: .8rem; }
+  .stackCanvasPlain{ height: clamp(420px, 72vh, 640px); }
+}
+
+/* ---------- REDUCED MOTION ON TOUCH-LIKE WIDTHS ---------- */
+@media (max-width: 900px) and (hover: none){
+  .glass:hover,
+  #work .gridDash .tile:hover{
+    transform: none;
+    box-shadow: 0 8px 26px rgba(0,0,0,.22);
+  }
+}
+
+/* ---------- SAFE-AREA POLISH ---------- */
+@media (max-width: 640px){
+  .siteHeader{ padding-top: env(safe-area-inset-top); }
+  .siteFooter{ padding-bottom: calc(1.2rem + env(safe-area-inset-bottom)); }
+}
+
+/* ===========================================================
+   CONTAINER QUERIES — make the grid adapt inside carousels
+   (works even if the viewport is wide but the slide is narrow)
+   =========================================================== */
+@container (max-width: 980px){
+  .gridDash{ gap: 1rem; }
+  .tileImg{ height: 150px; }
+  .tile:nth-child(1),
+  .tile:nth-child(2){ grid-column: span 12; }
+  .tile:nth-child(n+3){ grid-column: span 6; }
+}
+
+@container (max-width: 700px){
+  .gridDash{ grid-template-columns: 1fr; gap: .85rem; }
+  .tile{ min-height: 210px; }
+  .tileImg{ height: 130px; }
+  .gridHeadlineSlot{ grid-column: 1 / -1; }
+}
