@@ -54,8 +54,30 @@ export default function DashboardSection() {
   const baseShad = "0 10px 40px rgba(0,0,0,0.28)";
 
   return (
-    <section id="work" ref={sectionRef} style={{ padding: "6rem 4vw", position: "relative" }}>
-      {/* Carousel viewport */}
+  <section
+    id="work"
+    ref={sectionRef}
+    className="anchorSection"
+    style={{
+      position: "relative",
+      padding: "calc(6rem + var(--header-h)) 4vw 6rem", // keep your spacing but account for header
+      minHeight: "100vh",
+    }}
+  >
+    {/* invisible waypoint so the header spy can toggle "Work" as active at the right moment */}
+    <div
+      data-spy="work"
+      aria-hidden
+      style={{
+        position: "absolute",
+        top: "35vh",   // tweak if you want it earlier/later
+        left: 0,
+        width: 1,
+        height: 1,
+        pointerEvents: "none",
+      }}
+    />
+
       <div className="dashViewport">
         <motion.div
           className="dashTrack"
@@ -104,7 +126,12 @@ export default function DashboardSection() {
                       className="tile"
                       motionProps={motionProps}
                     >
-                      <img src={p.cover} alt="" className="tileImg" />
+                      <img
+  src={p.cover}
+  alt=""
+  className={`tileImg ${p.isLogo ? "isLogo" : ""}`}
+/>
+
                       <div className="tileBody">
                         <h3 className="tileTitle">{p.title}</h3>
                         <p className="meta">{p.subtitle}</p>
@@ -132,7 +159,7 @@ export default function DashboardSection() {
                         WORK IN <span className="accent">FOCUS</span>
                       </motion.h2>
                       <motion.p className="agencySub" variants={headChild}>
-                        Selected projects that blend design and code.
+                        Latest projects i've been working on/new things i've been learning lately
                       </motion.p>
                     </>
                   ) : (
@@ -141,7 +168,7 @@ export default function DashboardSection() {
                         MORE <span className="accent">PROJECTS</span>
                       </motion.h2>
                       <motion.p className="agencySub" variants={headChild}>
-                        Fresh experiments, iterations and in-progress work.
+                        Where it all began, experiments, and projects i used to learn new skills
                       </motion.p>
                     </>
                   )}

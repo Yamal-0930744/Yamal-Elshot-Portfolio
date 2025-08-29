@@ -92,3 +92,16 @@
   transform: translateY(-3px);
   box-shadow: 0 18px 64px rgba(123, 227, 197, 0.009);
 }
+
+/* ProfileCard paragraphs */
+.profileLead{
+  margin: .25rem 0 0;
+  white-space: pre-wrap;      /* keep manual line breaks if any */
+}
+
+.profileMore{
+  margin: .9rem 0 0;          /* pushes it lower */
+  color: var(--muted);
+  font-size: .95rem;
+  white-space: pre-wrap;
+}

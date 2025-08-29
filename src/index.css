@@ -1460,7 +1460,7 @@ html { scroll-behavior: smooth; }
   z-index: 0 !important; /* keep it behind everything interactive */
 }
 
-/* Make sure the actual content stacks above those backgrounds */
+/* CLICK-THROUGH SAFETY … */
 .layer-above,
 .gridDash,
 .stackCanvasWrap,
@@ -1468,11 +1468,12 @@ html { scroll-behavior: smooth; }
 .contactSection .contactCard,
 .dashViewport,
 .tile,
-.modalOverlay,
-.modalCard {
+.modalOverlay,          /* <-- this is the culprit */
+.modalCard {            /* <-- this too */
   position: relative;
   z-index: 1;
 }
+
 
 /* Header always above */
 .siteHeader, .siteHeader-inner { z-index: 1000; }
@@ -1480,4 +1481,171 @@ html { scroll-behavior: smooth; }
 /* If you ever add any other fixed canvases, force them to ignore clicks by default */
 .fxCanvas, .fixedCanvas {
   pointer-events: none !important;
+}
+
+/* modal overlay above any fixed canvases */
+.projectModalOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 10000;                /* HIGH */
+  background: rgba(10,12,12,.66);
+  backdrop-filter: blur(6px) saturate(120%);
+  -webkit-backdrop-filter: blur(6px) saturate(120%);
+  display: grid;
+  place-items: center;
+  pointer-events: auto;
+}
+
+.projectModalCard{
+  pointer-events: auto;
+  max-width: min(1100px, 92vw);
+  max-height: min(84vh, 880px);
+  overflow: auto;
+  /* keep whatever glass styles you already had */
+}
+
+/* 1) token — add to your existing :root (or paste as a new :root block) */
+:root{
+  --dash-gutter: clamp(14px, 2.4vw, 28px);
+}
+
+/* 2) give each carousel "page" side padding so tile hover glows aren't clipped */
+.dashPage{
+  /* you already have min-width:100% elsewhere; this just adds padding */
+  padding-inline: var(--dash-gutter);
+  box-sizing: border-box; /* explicit, though global box-sizing is already set */
+}
+
+/* 3) (optional) keep arrows visually aligned with the outer edge of content */
+.dashArrow.left  { left:  calc(6px + var(--dash-gutter)); }
+.dashArrow.right { right: calc(6px + var(--dash-gutter)); }
+
+/* 4) (optional) tiny vertical gutter if you see top/bottom clipping */
+.dashPage{ padding-block: clamp(8px, 1vw, 12px); }
+
+/* ===== Subtle, colorful hover for Work tiles ===== */
+
+/* Tune here */
+:root{
+  --tile-bg-alpha: .05;   /* background tint on hover */
+  --tile-ring-alpha: .30; /* border ring on hover     */
+  --tile-glow-alpha: .14; /* colored outer glow       */
+  --tile-glow-blur: 18px; /* softness of glow         */
+}
+
+/* Assign a color per tile (repeats every 4 cards) */
+#work .gridDash .tile { --tile-rgb: 123,227,198; }            /* default green */
+#work .gridDash .tile:nth-child(4n+1){ --tile-rgb: 123,227,198; } /* green  */
+#work .gridDash .tile:nth-child(4n+2){ --tile-rgb: 138,180,255; } /* blue   */
+#work .gridDash .tile:nth-child(4n+3){ --tile-rgb: 255,183, 77; } /* orange */
+#work .gridDash .tile:nth-child(4n+4){ --tile-rgb: 255, 99,146; } /* pink   */
+
+/* Base shadow a touch softer */
+#work .gridDash .tile{
+  position: relative;
+  box-shadow: 0 8px 26px rgba(0,0,0,.22);
+}
+
+/* Colored glow uses a pseudo-element so it’s soft & controlled */
+#work .gridDash .tile::after{
+  content:"";
+  position:absolute;
+  inset:-8px;                          /* lets the glow breathe a bit */
+  border-radius: inherit;
+  background:
+    radial-gradient(60% 80% at 50% 30%,
+      rgba(var(--tile-rgb), var(--tile-glow-alpha)),
+      rgba(var(--tile-rgb), 0) 60%);
+  filter: blur(var(--tile-glow-blur));
+  opacity: 0;                          /* only on hover */
+  transition: opacity .18s ease, transform .18s ease;
+  z-index: 0;                          /* behind content */
+}
+
+/* Lift content above the pseudo glow */
+#work .gridDash .tile > *{ position: relative; z-index: 1; }
+
+/* Hover: subtle lift + color preserved */
+#work .gridDash .tile:hover{
+  transform: translateY(-2px) scale(1.004);
+  background: rgba(var(--tile-rgb), var(--tile-bg-alpha));
+  border-color: rgba(var(--tile-rgb), var(--tile-ring-alpha));
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.24),                 /* neutral depth */
+    0 12px 32px rgba(var(--tile-rgb), .10);      /* faint tint */
+}
+#work .gridDash .tile:hover::after{ opacity: 1; transform: scale(1.01); }
+
+/* Logo covers — grayscale by default */
+.tileImg.isLogo{
+  object-fit: contain;                    /* don't crop logos */
+  padding: clamp(10px, 2.2vw, 18px);
+  height: 160px;                          /* matches your current tileImg height */
+  filter: grayscale(1) contrast(.9) saturate(.6) opacity(.7);
+  transform-origin: 50% 50%;
+  transition:
+    filter .28s ease,
+    transform .8s cubic-bezier(.22,1,.36,1);
+}
+
+/* On hover: bring back color + spin */
+.tile:hover .tileImg.isLogo{
+  filter: grayscale(0) contrast(1) saturate(1) opacity(1);
+  animation: logoSpin 1.2s linear infinite;   /* continuous while hovered */
+}
+
+/* If you prefer one quick spin per hover instead of continuous:
+   .tile:hover .tileImg.isLogo{ animation: logoSpin .8s cubic-bezier(.22,1,.36,1) 1 both; }
+*/
+
+/* Motion safety */
+@media (prefers-reduced-motion: reduce){
+  .tile:hover .tileImg.isLogo{ animation: none; transform: none; }
+}
+
+/* Show full screenshots in the project modal */
+.modalCard .galleryStage img {
+  object-fit: contain !important;   /* stop cropping */
+  background: #0b0c10;              /* nice letterbox */
+}
+
+/* Keep videos/embeds filling the stage */
+.modalCard .galleryStage video,
+.modalCard .galleryStage iframe {
+  object-fit: cover;
+}
+
+/* (Optional) give the stage a bit more height on desktop */
+@media (min-width: 900px){
+  .modalCard .galleryMain { height: clamp(320px, 56vh, 680px); }
+}
+
+/* --- SHOW FULL MEDIA IN PROJECT MODAL (no cropping) --- */
+.modalCard .galleryMain,
+.modalPanel .galleryMain{
+  /* make the stage tall enough but still viewport-friendly */
+  height: clamp(320px, 58vh, 760px) !important;
+}
+
+.modalCard .galleryStage,
+.modalPanel .galleryStage{
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: #0b0c10;           /* letterbox background */
+  overflow: hidden;
+}
+
+/* fit the whole thing inside the stage */
+.modalCard .galleryStage video,
+.modalCard .galleryStage img,
+.modalCard .galleryStage iframe,
+.modalPanel .galleryStage video,
+.modalPanel .galleryStage img,
+.modalPanel .galleryStage iframe{
+  max-width: 100% !important;
+  max-height: 100% !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;   /* <-- key: no crop */
 }

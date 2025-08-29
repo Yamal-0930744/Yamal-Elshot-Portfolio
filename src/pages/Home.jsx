@@ -112,32 +112,29 @@ export default function Home() {
         <div aria-hidden />
 
         <ProfileCard
-          imageSrc="/img/AboutPhoto.png"
-          title="Human First, Developer Second"
-          description="I’m Yamal, also known as Yems, a full-stack developer with a passion for crafting interfaces that feel intuitive and alive. I started with small school projects, and over time found myself drawn to the blend of design and engineering. My focus is on learning, experimenting, and steadily improving — one project at a time."
-        />
+  imageSrc="/img/AboutPhoto.png"
+  title="Human First, Developer Second"
+  description={`I’m Yamal. Some peopl call me Yems - a full-stack developer with a passion for crafting interfaces that feel intuitive and alive. My happy place is where taste meets logic; I turn messy ideas into clean, good looking experiences. My focus is on learning, experimenting, and steadily improving, one project at a time.
+
+creative thinker • visual taste + psychology-driven • detail-minded • collaborative • curious & always learning`}
+/>
+
       </section>
 
-      {/* JOURNEY */}
       <section id="journey" className="anchorSection" style={{ position: "relative" }}>
-        {/* optional ambient for this slice */}
         <div aria-hidden />
         <CreativeJourneySection />
       </section>
 
-      {/* WORK (DashboardSection already renders its own <section id="work" />) */}
       <DashboardSection />
 
-      {/* TOOLS (wrap with an anchor for header link & proper scroll-margin) */}
       <section id="tools" ref={toolsRef} className="anchorSection" style={{ position: "relative" }}>
         <div aria-hidden />
         <StackOrbit />
       </section>
 
-      {/* overlay FX that follows into Contact & bursts at the end */}
       <ContactPlumbobFX progress={contactProgress} />
 
-      {/* CONTACT + Footer */}
       <section id="contact" ref={contactRef} className="anchorSection">
         <ContactSection />
       </section>

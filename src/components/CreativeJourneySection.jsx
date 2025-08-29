@@ -54,7 +54,6 @@ export default function CreativeJourneySection() {
       animate={controls}
     >
       <div className="journeyGrid">
-        {/* LEFT: Story */}
         <div>
           <motion.h2 className="journeyHeading" variants={fadeUp}>
             A <span className="accent">creative</span> through every phase
@@ -69,7 +68,7 @@ export default function CreativeJourneySection() {
           <div className="journeyCols">
             {/* Roots */}
             <motion.div className="journeyBlock" variants={card(0)}>
-              <h4 className="journeyBlockTitle">Roots</h4>
+              <h4 className="journeyBlockTitle">From childhood</h4>
               <ul className="journeyList">
                 <li>Pencils, sketchbooks, Lego curiosity and “how does this work?”</li>
                 <li>Art & music classes: rhythm, color, and composition clicked early.</li>
@@ -77,34 +76,31 @@ export default function CreativeJourneySection() {
               </ul>
             </motion.div>
 
-            {/* Experiments */}
             <motion.div className="journeyBlock" variants={card(1)}>
-              <h4 className="journeyBlockTitle">Experiments</h4>
+              <h4 className="journeyBlockTitle">To my teen years</h4>
               <ul className="journeyList">
                 <li>Making beats - layers, timing, and flow taught me pacing.</li>
                 <li>Gameplay montages - cutting to music sharpened timing & transitions.</li>
               </ul>
             </motion.div>
 
-            {/* What it shaped */}
             <motion.div className="journeyBlock" variants={card(2)}>
-              <h4 className="journeyBlockTitle">What it shaped</h4>
+              <h4 className="journeyBlockTitle">And how it shaped adulthood</h4>
               <ul className="journeyList">
                 <li>Design as choreography - motion, reveal, rhythm.</li>
                 <li>Systems thinking - components & states as instruments.</li>
-                <li>Empathy & iteration - reduce friction, make intention obvious.</li>
+                <li>Tool assisted flow - using AI, light automation, and quick prototypes to streamline ideas and ship faster.</li>
               </ul>
             </motion.div>
           </div>
         </div>
 
-        {/* RIGHT: floating morphing model */}
         <motion.div variants={morphFx}>
           <CreativeJourneyMorph
             initial="plumbob"
             autoCycle
             interval={5200}
-            autoRotate={inView} // spins only while the section is visible
+            autoRotate={inView} 
           />
         </motion.div>
       </div>

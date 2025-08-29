@@ -2,7 +2,7 @@ import React from "react";
 
 export default function ContactSection() {
   return (
-    <section id="contact" className="contactSection anchorSection" aria-label="Contact">
+    <section className="contactSection anchorSection" aria-label="Contact">
       <div className="contactCard glass">
         <h2 className="contactTitle">
           Let’s <span className="accent">build</span> something
@@ -17,7 +17,7 @@ export default function ContactSection() {
           </a>
           <a
             className="ctaGhost"
-            href="https://www.linkedin.com/in/your-handle/"
+            href="www.linkedin.com/in/yamal-elshot-aa0129332"
             target="_blank"
             rel="noreferrer"
           >
