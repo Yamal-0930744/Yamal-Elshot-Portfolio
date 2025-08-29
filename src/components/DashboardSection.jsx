@@ -5,16 +5,6 @@ import GlassContainer from "./GlassContainer";
 import ProjectModal from "./ProjectModal";
 import { projects } from "../data/projects";
 
-/* Prefix relative asset paths with Vite's BASE_URL (needed on GitHub Pages). */
-const withBase = (path = "") => {
-  if (!path) return path;
-  // leave absolute/http(s), protocol-relative (//), data: and blob: alone
-  if (/^(?:[a-z]+:)?\/\//i.test(path) || /^data:|^blob:/i.test(path)) return path;
-  const base = (import.meta.env.BASE_URL || "/").replace(/\/+$/, "");
-  const clean = String(path).replace(/^\/+/, "");
-  return `${base}/${clean}`;
-};
-
 // small helper to vary hover/flash tints per card
 const tints = [
   { bg: "rgba(123,227,198,0.12)", ring: "rgba(123,227,198,0.45)", glow: "rgba(123,227,198,0.35)" }, // green
@@ -129,8 +119,6 @@ export default function DashboardSection() {
                     },
                   };
 
-                  const coverSrc = withBase(p.cover);
-
                   return (
                     <GlassContainer
                       key={p.id}
@@ -138,8 +126,9 @@ export default function DashboardSection() {
                       className="tile"
                       motionProps={motionProps}
                     >
+                      {/* use p.cover as provided by projects.js (already base-prefixed) */}
                       <img
-                        src={coverSrc}
+                        src={p.cover}
                         alt={p.title || ""}
                         className={`tileImg ${p.isLogo ? "isLogo" : ""}`}
                         loading="lazy"
